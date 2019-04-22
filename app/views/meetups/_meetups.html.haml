@@ -1,0 +1,24 @@
+- if meetups == :not_ready
+  = hidden_field_tag 'results_fetched', false
+  %div
+    Loading Meetups...
+- elsif meetups == :no_result
+  = hidden_field_tag 'results_fetched', true
+  %div
+    No results found.
+- else
+  = hidden_field_tag 'results_fetched', true
+  - meetups.each do |meetup|
+    .div.main-group
+      .image-div
+        = image_tag(meetup['photo'], size: "100x100", alt: "Meetup photo")
+      .label-div
+        .row
+          = meetup['name']
+        .row
+          = meetup['category']
+        .row
+          = meetup['status']
+        .row
+          = meetup['location']
+      %hr{ style: 'width: 100%; border-color: black;' }

@@ -1,0 +1,1 @@
+MEETUP_REDIS = Redis::Namespace.new('meetups')
