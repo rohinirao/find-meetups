@@ -1,5 +1,6 @@
 require 'rails_helper'
 RSpec.describe MeetupsController, type: :controller do
+  include ActiveJob::TestHelper
   let!(:result) {[
     {"name"=>"Munich Coding Meetup", "location"=>"München, Germany", "status"=>"active", "category"=>"Tech", "photo"=>"defualt_photo.svg"}
   ]}
@@ -19,14 +20,14 @@ RSpec.describe MeetupsController, type: :controller do
       it 'queues MeetupsSearchJob' do
         MEETUP_REDIS.del('test')
         get :search, xhr: true, format: :js, params: { search_text: 'test' }
-        expect(JSON.parse(MEETUP_REDIS.get('test'))).not_to be_empty
+        expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq(1)
       end
     end
     context 'when result is cached' do
       it 'not queues MeetupsSearchJob' do
         MEETUP_REDIS.set('test', result.to_json)
         get :search, xhr: true, format: :js, params: { search_text: 'test' }
-        expect(JSON.parse(MEETUP_REDIS.get('test')).first['name']).to eq(result.first['name'])
+        expect(ActiveJob::Base.queue_adapter.enqueued_jobs.size).to eq(0)
       end
     end
   end
